@@ -34,8 +34,7 @@ const SignInPage = () => {
         setErrorMessage(null);
 
         try {
-            const { accessToken } = await signIn({ username, password }).unwrap();
-            localStorage.setItem("accessToken", accessToken);
+            await signIn({ username, password }).unwrap();
             navigate("/tasks");
         } catch (error) {
             console.error(error);

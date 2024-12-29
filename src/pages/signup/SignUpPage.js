@@ -34,9 +34,10 @@ const SignUpPage = () => {
 
     const submit = async () => {
         try {
-            await signUp(username, password);
+            await signUp({ username, password }).unwrap();
             navigate("/signin");
         } catch (error) {
+            console.log("Error", error);
             const errorMessage = error.data.message;
             setErrorMessage(errorMessage);
         }

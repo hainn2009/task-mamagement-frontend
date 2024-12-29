@@ -7,10 +7,9 @@ import styled from "styled-components";
 import Task from "../../components/Task";
 import TasksFilters from "../../components/TasksFilters";
 import { useGetTasksQuery } from "../../services/new-tasks.service";
-import { setAccessToken } from "../../services/token-slice";
-import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../../services/authSlice";
 
 const TasksWrapper = styled.div`
     width: 100%;
@@ -24,11 +23,6 @@ const TasksHeader = styled.div`
     display: flex;
     justify-content: center;
     border-bottom: 3px solid #757c87;
-`;
-
-const Title = styled.h1`
-    width: 100%;
-    color: #edf4ff;
 `;
 
 const CreateButtonContainer = styled.div`
@@ -59,11 +53,12 @@ const SignOutIconContainer = styled.div`
 const TasksPage = () => {
     const { search, status } = useSelector((state) => state.filters);
     const { data: tasks, error, isLoading } = useGetTasksQuery({ search, status });
-    const dispatch = useDispatch();
+    const user = useSelector((state) => state.auth.user);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const handleSignOut = () => {
-        dispatch(setAccessToken(null));
+        dispatch(logout());
         navigate("/signin");
     };
 
@@ -78,7 +73,10 @@ const TasksPage = () => {
     return (
         <TasksWrapper>
             <TasksHeader>
-                <Title>Get things done.</Title>
+                <div style={{ textWrap: "nowrap" }}>
+                    <h1 style={{ width: "100%", color: "#edf4ff", marginBottom: 0 }}>Get things done</h1>
+                    <p style={{ marginTop: 0, color: "#edf4ff" }}>Hello, {user.username}</p>
+                </div>
 
                 <CreateButtonContainer>
                     <Fab variant="extended" onClick={() => navigate("/tasks/create")}>
