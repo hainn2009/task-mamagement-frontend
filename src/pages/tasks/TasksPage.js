@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import Fab from "@mui/material/Fab";
 import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
@@ -6,6 +6,10 @@ import SignOutIcon from "@mui/icons-material/ExitToApp";
 import styled from "styled-components";
 import Task from "../../components/Task";
 import TasksFilters from "../../components/TasksFilters";
+import { useGetTasksQuery } from "../../services/new-tasks.service";
+import { setAccessToken } from "../../services/token-slice";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router";
 
 const TasksWrapper = styled.div`
     width: 100%;
@@ -51,59 +55,49 @@ const SignOutIconContainer = styled.div`
     }
 `;
 
-class TasksPage extends Component {
-    componentDidMount() {
-        this.props.tasksStore.fetchTasks();
-    }
+const TasksPage = () => {
+    const { data: tasks, error, isLoading } = useGetTasksQuery();
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    handleSignOut = () => {
-        const { userStore, tasksStore } = this.props;
-        userStore.signout();
-        tasksStore.resetTasks();
-        window.location.hash = "/signin";
+    const handleSignOut = () => {
+        dispatch(setAccessToken(null));
+        navigate("/signin");
     };
 
-    renderTasks = () => {
-        const { tasksStore } = this.props;
-
-        if (!tasksStore.tasks.length) {
+    const renderTasks = () => {
+        if (tasks.length === 0) {
             return <EmptyTasksPlaceholder>No tasks available. Create one?</EmptyTasksPlaceholder>;
         }
 
-        return tasksStore.tasks.map((task) => <Task key={task.id} id={task.id} title={task.title} description={task.description} status={task.status} />);
+        return tasks.map((task) => <Task key={task.id} id={task.id} title={task.title} description={task.description} status={task.status} />);
     };
 
-    render() {
-        return (
-            <TasksWrapper>
-                <TasksHeader>
-                    <Title>Get things done.</Title>
+    return (
+        <TasksWrapper>
+            <TasksHeader>
+                <Title>Get things done.</Title>
 
-                    <CreateButtonContainer>
-                        <Fab
-                            variant="extended"
-                            onClick={() => {
-                                window.location.hash = "/tasks/create";
-                            }}
-                        >
-                            <AddIcon />
-                            Create Task
-                        </Fab>
+                <CreateButtonContainer>
+                    <Fab variant="extended" onClick={() => navigate("/tasks/create")}>
+                        <AddIcon />
+                        Create Task
+                    </Fab>
 
-                        <SignOutIconContainer>
-                            <IconButton onClick={this.handleSignOut}>
-                                <SignOutIcon className="signOutIcon" />
-                            </IconButton>
-                        </SignOutIconContainer>
-                    </CreateButtonContainer>
-                </TasksHeader>
+                    <SignOutIconContainer>
+                        <IconButton onClick={handleSignOut}>
+                            <SignOutIcon className="signOutIcon" />
+                        </IconButton>
+                    </SignOutIconContainer>
+                </CreateButtonContainer>
+            </TasksHeader>
 
-                <TasksFilters />
+            <TasksFilters />
 
-                <TasksContainer>{this.renderTasks()}</TasksContainer>
-            </TasksWrapper>
-        );
-    }
-}
+            {error && <h2>Something went wrong...</h2>}
+            {isLoading ? <h2>Loading...</h2> : <TasksContainer>{renderTasks()}</TasksContainer>}
+        </TasksWrapper>
+    );
+};
 
 export default TasksPage;

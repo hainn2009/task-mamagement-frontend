@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { api } from "./apiSlice";
+// import { authApi } from "./new-auth.service";
 
 const tokenSlice = createSlice({
     name: "auth",
@@ -11,11 +11,12 @@ const tokenSlice = createSlice({
             state.accessToken = action.payload;
         },
     },
-    extraReducers: (builder) => {
-        builder.addMatcher(api.endpoints.signin.matchFulfilled, (state, action) => {
-            state.accessToken = action.payload.accessToken;
-        });
-    },
+    // TODO: Uncomment this code to handle the sign-in action
+    // extraReducers: (builder) => {
+    //     builder.addMatcher(api.endpoints.signin.matchFulfilled, (state, action) => {
+    //         state.accessToken = action.payload.accessToken;
+    //     });
+    // },
 });
 
 export const { setAccessToken } = tokenSlice.actions;

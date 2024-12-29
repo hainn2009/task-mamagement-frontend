@@ -13,8 +13,8 @@ const App = () => {
             <Route path="/signin/" element={<SignInPage />} />
             <Route path="/signup/" element={<SignUpPage />} />
             <Route path="tasks" element={<ProtectedRoute />}>
-                <Route component={TasksPage} />
-                <Route path="create" component={CreateTaskPage} />
+                <Route index element={<TasksPage />} />
+                <Route path="create" element={<CreateTaskPage />} />
             </Route>
         </Routes>
     );

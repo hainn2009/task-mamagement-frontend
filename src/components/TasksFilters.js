@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import Grid from "@mui/material/Grid";
+import { useState } from "react";
+import Grid from "@mui/material/Grid2";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
@@ -7,8 +7,8 @@ import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import styled from "styled-components";
-import { Subject } from "rxjs";
-import { debounceTime } from "rxjs/operators";
+import { setFilters } from "../services/filters-slice";
+import { useDispatch } from "react-redux";
 
 const FiltersContainer = styled.div`
     margin-top: 20px;
@@ -20,79 +20,58 @@ const ControlContainer = styled.div`
     padding: 10px;
 `;
 
-class TasksFilters extends Component {
-    filters$ = new Subject();
+const TasksFilters = () => {
+    const [status, setStatus] = useState("");
+    const [search, setSearch] = useState("");
+    const dispatch = useDispatch();
 
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            status: props.tasksStore.filters.status,
-            search: props.tasksStore.filters.search,
-        };
-
-        this.filters$.pipe(debounceTime(500)).subscribe((filters) => {
-            props.tasksStore.updateFilters(filters);
-        });
-    }
-
-    syncFilters = () => {
-        const { status, search } = this.state;
-        this.filters$.next({ status, search });
+    const handleStatusFilterChange = (e) => {
+        setStatus(e.target.value);
+        dispatch(setFilters({ search, status: e.target.value }));
     };
 
-    handleStatusFilterChange = (e) => {
-        const status = e.target.value;
-        this.setState({ status }, this.syncFilters);
+    const handleSearchFilterChange = (e) => {
+        setSearch(e.target.value);
+        dispatch(setFilters({ search: e.target.value, status }));
     };
 
-    handleSearchTermChange = (e) => {
-        const search = e.target.value;
-        this.setState({ search }, this.syncFilters);
-    };
-
-    render() {
-        return (
-            <FiltersContainer>
-                <Grid
-                    justify="space-between" // Add it here :)
-                    container
-                >
-                    <Grid item>
-                        <ControlContainer>
-                            <FormControl style={{ width: "220px" }}>
-                                <TextField
-                                    placeholder="Search..."
-                                    value={this.state.search}
-                                    onChange={this.handleSearchTermChange}
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <SearchIcon />
-                                            </InputAdornment>
-                                        ),
-                                    }}
-                                />
-                            </FormControl>
-                        </ControlContainer>
-                    </Grid>
-
-                    <Grid item>
-                        <ControlContainer>
-                            <FormControl style={{ width: "220px" }}>
-                                <Select value={this.state.status} onChange={this.handleStatusFilterChange} displayEmpty>
-                                    <MenuItem value="">No status filter</MenuItem>
-                                    <MenuItem value={"OPEN"}>Open</MenuItem>
-                                    <MenuItem value={"IN_PROGRESS"}>In Progress</MenuItem>
-                                    <MenuItem value={"DONE"}>Done</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </ControlContainer>
-                    </Grid>
+    return (
+        <FiltersContainer>
+            <Grid justifyContent="space-between" container>
+                <Grid>
+                    <ControlContainer>
+                        <FormControl style={{ width: "220px" }}>
+                            <TextField
+                                placeholder="Search..."
+                                value={search}
+                                onChange={handleSearchFilterChange}
+                                InputProps={{
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <SearchIcon />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                        </FormControl>
+                    </ControlContainer>
                 </Grid>
-            </FiltersContainer>
-        );
-    }
-}
+
+                <Grid>
+                    <ControlContainer>
+                        <FormControl style={{ width: "220px" }}>
+                            <Select value={status} onChange={handleStatusFilterChange} displayEmpty>
+                                <MenuItem value="">No status filter</MenuItem>
+                                <MenuItem value={"OPEN"}>Open</MenuItem>
+                                <MenuItem value={"IN_PROGRESS"}>In Progress</MenuItem>
+                                <MenuItem value={"DONE"}>Done</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </ControlContainer>
+                </Grid>
+            </Grid>
+        </FiltersContainer>
+    );
+};
 
 export default TasksFilters;

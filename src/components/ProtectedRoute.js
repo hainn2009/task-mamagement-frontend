@@ -1,14 +1,13 @@
 import React from "react";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router";
+import { useNavigate, Outlet } from "react-router";
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = () => {
     const navigate = useNavigate();
-    const accessToken = useSelector((state) => state.auth.accessToken);
+    const accessToken = localStorage.getItem("accessToken");
     if (!accessToken) {
         return navigate("/signin");
     }
-    return <div>{children}</div>;
+    return <Outlet />;
 };
 
 export default ProtectedRoute;
