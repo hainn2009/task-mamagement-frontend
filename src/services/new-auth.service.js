@@ -11,10 +11,6 @@ export const authApi = createApi({
                 url: "signin",
                 method: "POST",
                 body: { username, password },
-                // const result = await post(`${this.BASE_URL}/auth/signin`, { username, password });
-                //     const accessToken = result.data.accessToken;
-                //     this.saveToken(accessToken);
-                //     return result.data.username;
             }),
         }),
         signUp: builder.mutation({
@@ -22,7 +18,6 @@ export const authApi = createApi({
                 url: "signup",
                 method: "POST",
                 body: { username, password },
-                // await post(`${this.BASE_URL}/auth/signup`, { username, password });
             }),
         }),
     }),

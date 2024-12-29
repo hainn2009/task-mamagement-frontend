@@ -22,8 +22,32 @@ export const taskApi = createApi({
                 if (status) query += `status=${status}`;
                 return query;
             },
+            providesTags: ["Tasks"],
+        }),
+        createTask: builder.mutation({
+            query: ({ title, description }) => ({
+                url: "tasks",
+                method: "POST",
+                body: { title, description },
+            }),
+            invalidatesTags: ["Tasks"],
+        }),
+        updateTaskStatus: builder.mutation({
+            query: ({ id, status }) => ({
+                url: `tasks/${id}/status`,
+                method: "PATCH",
+                body: { status },
+            }),
+            invalidatesTags: ["Tasks"],
+        }),
+        deleteTask: builder.mutation({
+            query: (id) => ({
+                url: `tasks/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["Tasks"],
         }),
     }),
 });
 
-export const { useGetTasksQuery } = taskApi;
+export const { useGetTasksQuery, useCreateTaskMutation, useDeleteTaskMutation, useUpdateTaskStatusMutation } = taskApi;

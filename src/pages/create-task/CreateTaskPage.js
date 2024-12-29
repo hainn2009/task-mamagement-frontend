@@ -1,9 +1,11 @@
-import React, { Component } from "react";
+import { useState } from "react";
 import TextField from "@mui/material/TextField";
 import FormControl from "@mui/material/FormControl";
 import Button from "@mui/material/Button";
 import styled from "styled-components";
 import ErrorMessage from "../../components/ErrorMessage";
+import { useCreateTaskMutation } from "../../services/new-tasks.service";
+import { useNavigate } from "react-router";
 
 const FormWrapper = styled.div`
     width: 100vw;
@@ -21,67 +23,53 @@ const FormContainer = styled.div`
     border-radius: 5px;
 `;
 
-class CreateTaskPage extends Component {
-    constructor(props) {
-        super(props);
+const CreateTaskPage = () => {
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [errorMessage, setErrorMessage] = useState(null);
 
-        this.state = {
-            title: "",
-            description: "",
-            errorMessage: null,
-        };
-    }
+    const [createTask] = useCreateTaskMutation();
+    const navigate = useNavigate();
 
-    handleSubmitTask = async () => {
-        const { tasksStore } = this.props;
-        const { title, description } = this.state;
-
+    const handleSubmitTask = async () => {
         try {
-            await tasksStore.createTask(title, description);
-            window.location.hash = "/tasks";
+            await createTask({ title, description });
+            navigate("/tasks");
         } catch (error) {
-            const errorMessage = error.response.data.message;
-            this.setState({ errorMessage });
+            const errorMessage = error.data.message;
+            setErrorMessage(errorMessage);
         }
     };
 
-    render() {
-        return (
-            <FormWrapper>
-                <FormContainer>
-                    <h1>Create a new task</h1>
-                    <p>Provide information about the task you wish to complete.</p>
+    return (
+        <FormWrapper>
+            <FormContainer>
+                <h1>Create a new task</h1>
+                <p>Provide information about the task you wish to complete.</p>
 
-                    {this.state.errorMessage && <ErrorMessage message={this.state.errorMessage} />}
+                {errorMessage && <ErrorMessage message={errorMessage} />}
 
-                    <FormControl fullWidth>
-                        <TextField
-                            label="Title"
-                            placeholder="Title"
-                            margin="normal"
-                            variant="outlined"
-                            onChange={(e) => this.setState({ title: e.target.value })}
-                        />
-                    </FormControl>
-                    <FormControl fullWidth>
-                        <TextField
-                            label="Description"
-                            placeholder="Description"
-                            multiline
-                            rows="8"
-                            margin="normal"
-                            variant="outlined"
-                            onChange={(e) => this.setState({ description: e.target.value })}
-                        />
-                    </FormControl>
+                <FormControl fullWidth>
+                    <TextField label="Title" placeholder="Title" margin="normal" variant="outlined" onChange={(e) => setTitle(e.target.value)} />
+                </FormControl>
+                <FormControl fullWidth>
+                    <TextField
+                        label="Description"
+                        placeholder="Description"
+                        multiline
+                        rows="8"
+                        margin="normal"
+                        variant="outlined"
+                        onChange={(e) => setDescription(e.target.value)}
+                    />
+                </FormControl>
 
-                    <Button style={{ marginTop: "10px" }} fullWidth variant="contained" color="primary" onClick={this.handleSubmitTask}>
-                        CREATE TASK
-                    </Button>
-                </FormContainer>
-            </FormWrapper>
-        );
-    }
-}
+                <Button style={{ marginTop: "10px" }} fullWidth variant="contained" color="primary" onClick={handleSubmitTask}>
+                    CREATE TASK
+                </Button>
+            </FormContainer>
+        </FormWrapper>
+    );
+};
 
 export default CreateTaskPage;
