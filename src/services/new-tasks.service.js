@@ -16,7 +16,12 @@ export const taskApi = createApi({
     }),
     endpoints: (builder) => ({
         getTasks: builder.query({
-            query: () => `tasks`,
+            query: ({ search, status }) => {
+                let query = "/tasks?";
+                if (search) query += `search=${search}&`;
+                if (status) query += `status=${status}`;
+                return query;
+            },
         }),
     }),
 });

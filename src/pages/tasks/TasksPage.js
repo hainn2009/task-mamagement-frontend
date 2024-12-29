@@ -10,6 +10,7 @@ import { useGetTasksQuery } from "../../services/new-tasks.service";
 import { setAccessToken } from "../../services/token-slice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
+import { useSelector } from "react-redux";
 
 const TasksWrapper = styled.div`
     width: 100%;
@@ -56,7 +57,8 @@ const SignOutIconContainer = styled.div`
 `;
 
 const TasksPage = () => {
-    const { data: tasks, error, isLoading } = useGetTasksQuery();
+    const { search, status } = useSelector((state) => state.filters);
+    const { data: tasks, error, isLoading } = useGetTasksQuery({ search, status });
     const dispatch = useDispatch();
     const navigate = useNavigate();
 

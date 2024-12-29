@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { debounce } from "lodash";
 import Grid from "@mui/material/Grid2";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
@@ -25,14 +26,22 @@ const TasksFilters = () => {
     const [search, setSearch] = useState("");
     const dispatch = useDispatch();
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const debouncedSetFilters = useCallback(
+        debounce((search, status) => {
+            dispatch(setFilters({ search, status }));
+        }, 500),
+        []
+    );
+
     const handleStatusFilterChange = (e) => {
         setStatus(e.target.value);
-        dispatch(setFilters({ search, status: e.target.value }));
+        debouncedSetFilters(search, e.target.value);
     };
 
     const handleSearchFilterChange = (e) => {
         setSearch(e.target.value);
-        dispatch(setFilters({ search: e.target.value, status }));
+        debouncedSetFilters(e.target.value, status);
     };
 
     return (
@@ -45,12 +54,14 @@ const TasksFilters = () => {
                                 placeholder="Search..."
                                 value={search}
                                 onChange={handleSearchFilterChange}
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <SearchIcon />
-                                        </InputAdornment>
-                                    ),
+                                slotProps={{
+                                    input: {
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <SearchIcon />
+                                            </InputAdornment>
+                                        ),
+                                    },
                                 }}
                             />
                         </FormControl>
